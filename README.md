@@ -18,13 +18,93 @@ This repo has made the following customizations for Azure China:
 
 
 # Getting Started
-1.	...
+1. **Architecture**
+2. **Prerequisites**
+
+## **Azure Linux VM**
+<!--- Indent entire section -->
+<div style="margin-left: 1.5em;">
+
+### Git
+
+Install the latest version of [git](https://git-scm.com/downloads) if it is not already installed.
+
+```shell
+$ sudo apt-get install git
+```
+
+### cURL
+
+Install the latest version of [cURL](https://curl.haxx.se/download.html) if it is not already installed.
+
+```shell
+$ sudo apt-get install curl
+```
+
+### Docker
+
+Install the latest version of [Docker](https://docs.docker.com/get-docker/) if it is not already installed. 
+
+```shell
+sudo apt-get -y install docker-compose
+```
+
+Once installed, confirm that the latest versions of both Docker and Docker Compose executables were installed.
+
+```shell
+$ docker --version
+Docker version 19.03.12, build 48a66213fe
+$ docker-compose --version
+docker-compose version 1.27.2, build 18f557f9
+```
+
+Make sure the Docker daemon is running.
+
+```shell
+sudo systemctl start docker
+```
+
+Optional: If you want the Docker daemon to start when the system starts, use the following:
+
+```shell
+sudo systemctl enable docker
+```
+
+Add your user to the Docker group.
+
+```shell
+sudo usermod -a -G docker <username>
+```
+
+#### Go
+
+Optional: Install the latest version of [Go](https://golang.org/doc/install) if it is not already installed
+(only required if you will be writing Go chaincode or SDK applications).
+
+#### JQ
+
+Optional: Install the latest version of [jq](https://stedolan.github.io/jq/download/) if it is not already installed
+(only required for the tutorials related to channel configuration transactions).
+
+</div>
+
 
 ## Docs 🛠
-- [Installation Guide : For customization of microsoft arm template for user defined organisation details.](docs/InstallationGuide.md)
+- [Install HLF Deployer : ](docs/HLFDeployer.md)
 
-- [Generating Profiles : The admin,msp and connection profiles for orderer and peer.](docs/CreatingProfiles.md)
+- [Deploying Orderer Nodes : ](docs/DeployOrdererNodes.md)
 
-- [Fabric CA Operations : Step if you wish to create a custom user for fabric ca.](docs/CA.md)
- 
-      - [Installation Guide](docs/InstallationGuide.md)
+- [Deploying Peer Nodes : ](docs/DeployPeerNodes.md)
+
+- [Generating Profiles : The admin,msp and connection profiles for orderer and peer.](docs/GeneratingProfiles.md)
+
+- [Creating Consortium : Creation of multiple organisations and their crypto materials.](docs/CreatingConsortium.md)
+
+- [Setup Fabric Cli Go : Command line interface for interacting with the blockchain system.](docs/FabricGoCli.md)
+
+- [Channel Operations : Creation of channels and basic operations on them.](docs/ChannelOperations.md)
+
+- [Deploy External Chaincode : Executing chaincode on an external container. This an advanced feature.](docs/ExternalChaincode.md)
+
+
+
