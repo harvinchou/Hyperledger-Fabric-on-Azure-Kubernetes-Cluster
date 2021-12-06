@@ -146,7 +146,7 @@ Use the following commands to generate a connection string for an Azure file sha
 
     STORAGE_KEY=$(az storage account keys list --resource-group $STORAGE_RESOURCE_GROUP  --account-name $STORAGE_ACCOUNT --query "[0].value" | tr -d '"')
     SAS_TOKEN=$(az storage account generate-sas --account-key $STORAGE_KEY --account-name $STORAGE_ACCOUNT --expiry `date -u -d "1 day" '+%Y-%m-%dT%H:%MZ'` --https-only --permissions lruwd --resource-types sco --services f | tr -d '"')
-    AZURE_FILE_CONNECTION_STRING=https://$STORAGE_ACCOUNT.file.core.windows.net/$STORAGE_FILE_SHARE?$SAS_TOKEN
+    AZURE_FILE_CONNECTION_STRING=https://$STORAGE_ACCOUNT.file.core.chinacloudapi.cn/$STORAGE_FILE_SHARE?$SAS_TOKEN
 
 #### Import an organization connection profile, admin user identity, and MSP
 

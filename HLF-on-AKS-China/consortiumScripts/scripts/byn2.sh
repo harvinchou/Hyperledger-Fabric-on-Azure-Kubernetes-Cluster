@@ -43,7 +43,7 @@ function printUploadOrgMSPHelp() {
   echo "  byn.sh uploadOrgMSP <storageURI-with-SAStoken>"
   echo ""
   echo "Example:"
-  echo "byn.sh uploadOrgMSP \"https://[account].file.core.windows.net/[file-share]?[SAS]\""
+  echo "byn.sh uploadOrgMSP \"https://[account].file.core.chinacloudapi.cn/[file-share]?[SAS]\""
   echo ""
   echo "byn.sh uploadOrgMSP -h   print this message"
   echo
@@ -55,7 +55,7 @@ printAddPeerInConsortiumHelp() {
   echo "  byn.sh addPeerInConsortium <peerOrgName> <storageURI-with-SAStoken>"
   echo ""
   echo "Example:"
-  echo "byn.sh addPeerInConsortium \"org1\" \"https://[account].file.core.windows.net/[file-share]?[SAS]\""
+  echo "byn.sh addPeerInConsortium \"org1\" \"https://[account].file.core.chinacloudapi.cn/[file-share]?[SAS]\""
   echo ""
   echo "byn.sh addPeerInConsortium -h   print this message"
   echo
@@ -79,7 +79,7 @@ printJoinNodesInChannelHelp() {
   echo "  byn.sh joinNodesInChannel <channelName> <ordererAddress> <storageURI-with-SAStoken>"
   echo ""
   echo "Example:"
-  echo "byn.sh joinNodesInChannel \"mychannel\" \"orderer1.5ef38927f80e49d5b0de.southeastasia.aksapp.io:443\" \"https://[account].file.core.windows.net/[file-share]?[SAS]\""
+  echo "byn.sh joinNodesInChannel \"mychannel\" \"orderer1.5ef38927f80e49d5b0de.southeastasia.aksapp.io:443\" \"https://[account].file.core.chinacloudapi.cn/[file-share]?[SAS]\""
   echo ""
   echo "byn.sh joinNodesInChannel -h   print this message"
   echo
@@ -91,7 +91,7 @@ printUpdateAnchorPeerHelp() {
   echo "  byn.sh updateAnchorPeer <commaSeperatedListofPeerNodesName> <channelName> <ordererAddress> <storageURI-with-SAStoken>"
   echo ""
   echo "Example:"
-  echo "byn.sh updateAnchorPeer \"peer1\" \"mychannel\" \"orderer1.5ef38927f80e49d5b0de.southeastasia.aksapp.io:443\" \"https://[account].file.core.windows.net/[file-share]?[SAS]\""
+  echo "byn.sh updateAnchorPeer \"peer1\" \"mychannel\" \"orderer1.5ef38927f80e49d5b0de.southeastasia.aksapp.io:443\" \"https://[account].file.core.chinacloudapi.cn/[file-share]?[SAS]\""
   echo ""
   echo "byn.sh updateAnchorPeer -h   print this message"
   echo
@@ -117,7 +117,7 @@ printInstantiateDemoChaincodeHelp() {
   echo "  byn.sh instantiateDemoChaincode <peerNodeName> <channelName> <ordererAddress> <storageURI-with-SAStoken>"
   echo ""
   echo "Example:"
-  echo "byn.sh instantiateDemoChaincode \"peer1\" \"mychannel\" \"orderer1.5ef38927f80e49d5b0de.southeastasia.aksapp.io:443\" \"https://[account].file.core.windows.net/[file-share]?[SAS]\""
+  echo "byn.sh instantiateDemoChaincode \"peer1\" \"mychannel\" \"orderer1.5ef38927f80e49d5b0de.southeastasia.aksapp.io:443\" \"https://[account].file.core.chinacloudapi.cn/[file-share]?[SAS]\""
   echo ""
   echo "byn.sh instantiateDemoChaincode -h   print this message"
   echo
@@ -129,7 +129,7 @@ printInvokeDemoChaincodeHelp() {
   echo "  byn.sh invokeDemoChaincode <peerNodeName> <channelName> <ordererAddress> <storageURI-with-SAStoken>"
   echo ""
   echo "Example:"
-  echo "byn.sh invokeDemoChaincode \"peer1\" \"mychannel\" \"orderer1.5ef38927f80e49d5b0de.southeastasia.aksapp.io:443\" \"https://[account].file.core.windows.net/[file-share]?[SAS]\""
+  echo "byn.sh invokeDemoChaincode \"peer1\" \"mychannel\" \"orderer1.5ef38927f80e49d5b0de.southeastasia.aksapp.io:443\" \"https://[account].file.core.chinacloudapi.cn/[file-share]?[SAS]\""
   echo ""
   echo "byn.sh invokeDemoChaincode -h   print this message"
   echo
