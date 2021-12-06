@@ -877,7 +877,55 @@
     "outputs": {
       "hlfDeploy": {
         "type": "string",
-        "value": "[concat('Deploy finished.\nUse next command for connect directly to the aks cluster \naz aks get-credentials –g ', variables('resourceGroup'), ' -n ', parameters('clusterName'), ' password= ', variables('pg_administratorPassword'))]"
+        "value": "[concat('Deploy finished.\nUse next command for connect directly to the aks cluster \naz aks get-credentials –g ', variables('resourceGroup'), ' -n ', parameters('clusterName'))]"
+      },
+      "endpoint": {
+        "type": "string",
+        "value": "[concat('https://', reference(resourceId('Microsoft.Web/sites/', variables('funcName'))).hostNames[0], '/api/{requestPath}', '?code=', listSecrets(resourceId('Microsoft.Web/sites/functions',variables('funcName'),'HttpTrigger'), '2018-11-01').key)]"
+      },
+      "hlfOrgName": {
+        "type": "string",
+        "value": "[parameters('hlfOrgName')]"
+      },
+      "hlfNodesNumber": {
+        "type": "string",
+        "value": "[variables('hlfNumberNodes')]"
+      },
+      "hlfMemberType": {
+        "type": "string",
+        "value": "[parameters('hlfMemberType')]"
+      },
+      "hlfBackendDbType": {
+        "type": "string",
+        "value": "[parameters('hlfBackendDbType')]"
+      },
+      "clusterName": {
+        "type": "string",
+        "value": "[parameters('clusterName')]"
+      },
+      "kubernetesVersion": {
+        "type": "string",
+        "value": "[parameters('kubernetesVersion')]"
+      },
+      "userName": {
+        "type": "string",
+        "value": "[parameters('hlfUserName')]"
+      },
+      "userPswd": {
+        "type": "string",
+        "value": "[parameters('hlfCaPswd')]"
+      },
+      "postgresConnectionString": {
+        "type": "string",
+        "value": "[format('host={0} port=5432 user={1} password={2} dbname={3} sslmode=verify-full', reference(resourceId('Microsoft.DBforPostgreSQL/servers', variables('pg_fabric_ca_server_name')), '2017-12-01').fullyQualifiedDomainName, concat(variables('pg_administratorLogin'),'@', variables('pg_fabric_ca_server_name')), variables('pg_administratorPassword'), variables('pg_fabric_ca_database_name'))]"
+      },
+      "publicIpAddress": {
+        "type": "string",
+        "value": "[reference('publicIpDeployment').outputs.publicIpAddress.value]"
+      },
+      "dnsZoneDomain": {
+        "type": "string",
+        "value": "[reference(resourceId('Microsoft.ContainerService/managedClusters/', parameters('clusterName')), '2020-09-01').addonProfiles.httpApplicationRouting.config.HTTPApplicationRoutingZoneName]"
       }
     }
   }
