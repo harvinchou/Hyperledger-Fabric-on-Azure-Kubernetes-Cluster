@@ -145,6 +145,9 @@ function printOrg {
     # For organization policies, their canonical path is usually
     #   /Channel/<Application|Orderer>/<OrgName>/<PolicyName>
     Policies:
+        Endorsement:
+            Type: Signature
+            Rule: \"OR('${ORG_MSP_ID}.member')\"    
         Readers:
             Type: Signature
             Rule: \"OR('${ORG_MSP_ID}.member')\"
@@ -226,6 +229,12 @@ Application: &ApplicationDefaults
     # For Application policies, their canonical path is
     #   /Channel/Application/<PolicyName>
     Policies:
+        LifecycleEndorsement:
+            Type: ImplicitMeta
+            Rule: \"MAJORITY Endorsement\"
+        Endorsement:
+            Type: ImplicitMeta
+            Rule: \"MAJORITY Endorsement\"    
         Readers:
             Type: ImplicitMeta
             Rule: \"ANY Readers\"
@@ -308,8 +317,6 @@ echo "
             <<: *OrdererCapabilities
     Application:
         <<: *ApplicationDefaults
-        Organizations:
-            - <<: *${ORG_AKS_NAME}
     Consortiums:
       SampleConsortium:
         Organizations:

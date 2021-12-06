@@ -23,7 +23,7 @@ export const builder = (yargs: Argv): Arguments =>
             type: "string",
             alias: "f",
             description:
-                "The azure file share url to download connection profile. Should be in format: https://$STORAGE_ACCOUNT.file.core.chinacloudapi.cn/$STORAGE_FILE_SHARE?$SAS_TOKEN. On Windows please wrap argument in triple quotes!"
+                "The azure file share url to download connection profile. Should be in format: https://$STORAGE_ACCOUNT.file.core.windows.net/$STORAGE_FILE_SHARE?$SAS_TOKEN. On Windows please wrap argument in triple quotes!"
         }).argv;
 
 export const handler = async (argv: Arguments): Promise<void> => {

@@ -29,16 +29,16 @@ Organizations:
         Policies:
             Readers:
                 Type: Signature
-                Rule: "OR('OrgName.admin', 'OrgName.peer', 'OrgName.client')"
+                Rule: "OR('OrgName.member')"
             Writers:
                 Type: Signature
-                Rule: "OR('OrgName.admin', 'OrgName.client')"
+                Rule: "OR('OrgName.member')"
             Admins:
                 Type: Signature
                 Rule: "OR('OrgName.admin')"
             Endorsement:
                 Type: Signature
-                Rule: "OR('OrgName.peer','OrgName.member')"
+                Rule: "OR('OrgName.member')"
 
 ################################################################################
 #
@@ -123,12 +123,12 @@ Application: &ApplicationDefaults
         Admins:
             Type: ImplicitMeta
             Rule: "MAJORITY Admins"
-        # LifecycleEndorsement:
-        #     Type: ImplicitMeta
-        #     Rule: "MAJORITY Endorsement"
-        # Endorsement:
-        #     Type: ImplicitMeta
-        #     Rule: "MAJORITY Endorsement"
+        LifecycleEndorsement:
+            Type: ImplicitMeta
+            Rule: "MAJORITY Endorsement"
+        Endorsement:
+            Type: ImplicitMeta
+            Rule: "MAJORITY Endorsement"
 
     Capabilities:
         <<: *ApplicationCapabilities

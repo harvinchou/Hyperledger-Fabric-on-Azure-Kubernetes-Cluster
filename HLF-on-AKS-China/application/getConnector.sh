@@ -10,10 +10,10 @@ resourceId="/subscriptions/$subscriptionId/resourceGroups/$resourceGroup/provide
 
 accessToken=$(az account get-access-token --query accessToken -o tsv)
 functionName="ConfigManager"
-listFunctionKeysUrl="https://management.chinacloudapi.cn$resourceId/functions/$functionName/listKeys?api-version=2018-02-01"
+listFunctionKeysUrl="https://management.azure.com$resourceId/functions/$functionName/listKeys?api-version=2018-02-01"
 
 functionRes=$(curl -s -X POST $listFunctionKeysUrl -H "Content-Type: application/json" -H "Authorization: Bearer $accessToken" -H 'Content-Length: 0')
 function="${functionRes//[\{\}\":]}"
 functionDefaultKey="${function//default}"
 
-echo -e "\nhttps://$webAppName.chinacloudsites.cn/api/{action}?code=$functionDefaultKey\n"
+echo -e "\nhttps://$webAppName.azurewebsites.net/api/{action}?code=$functionDefaultKey\n"

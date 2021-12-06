@@ -117,7 +117,7 @@ export class AzureBlockchainService {
         const funcAppName = funcApps[0].name;
         const webAppResourceId = `/subscriptions/${subscriptionId}/resourceGroups/${resourceGroup}/providers/Microsoft.Web/sites/${funcAppName}`;
         const configManagerFuncName = "ConfigManager";
-        const listFunctionKeysUrl = `https://management.chinacloudapi.cn${webAppResourceId}/functions/${configManagerFuncName}/listKeys?api-version=2018-02-01`;
+        const listFunctionKeysUrl = `https://management.azure.com${webAppResourceId}/functions/${configManagerFuncName}/listKeys?api-version=2018-02-01`;
 
         const token = await credentials.getToken();
         const config: AxiosRequestConfig = {
@@ -131,7 +131,7 @@ export class AzureBlockchainService {
 
         // now we have url to the connection manager of marketplace based app
         const defaultKey: string = keysResponse.data.default;
-        const configManagerUri = `https://${funcAppName}.chinacloudsites.cn/api/{action}?code=${defaultKey}`;
+        const configManagerUri = `https://${funcAppName}.azurewebsites.net/api/{action}?code=${defaultKey}`;
         let profileUri: string;
         switch (profileType) {
             case ProfileType.Admin:

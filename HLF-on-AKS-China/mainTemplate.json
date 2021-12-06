@@ -334,9 +334,7 @@
         "westcentralus": "westcentralus",
         "westeurope": "westeurope",
         "westus2": "westus2",
-        "westus": "westus",
-		"chinaeast": "chinaeast",
-		"chinaeast2": "chinaeast2"
+        "westus": "westus"
       },
       "insightsLocationMap": {
         "australiaeast": "australiaeast",
@@ -366,14 +364,12 @@
         "ukwest": "uksouth",
         "westeurope": "westeurope",
         "westus": "westus",
-        "westus2": "westus2",
-		"chinaeast": "chinaeast",
-		"chinaeast2": "chinaeast2"
+        "westus2": "westus2"
       },
-      "logAnalyticsWorkspaceFallbackLocation": "chinaeast2",
+      "logAnalyticsWorkspaceFallbackLocation": "eastus",
       "logAnalyticsWorkspaceLocation": "[if(contains(variables('logAnalyticsWorkspaceLocationMap'), parameters('location')), variables('logAnalyticsWorkspaceLocationMap')[parameters('location')], variables('logAnalyticsWorkspaceFallbackLocation'))]",
   
-      "insightsFallbackLocation": "chinaeast2",
+      "insightsFallbackLocation": "eastus",
       "insightsLocation": "[if(contains(variables('insightsLocationMap'), parameters('location')), variables('insightsLocationMap')[parameters('location')], variables('insightsFallbackLocation'))]",
   
       "storageName": "[uniqueString(resourceGroup().id)]",
@@ -408,11 +404,9 @@
         "westindia": "westus2",
         "koreasouth": "westus2",
         "koreacentral": "westus2",
-        "southafricanorth": "northeurope",
-		"chinaeast": "chinaeast",
-		"chinaeast2": "chinaeast2"
+        "southafricanorth": "northeurope"
       },
-      "hlfResourceProviderFallbackLocation": "chinaeast2",
+      "hlfResourceProviderFallbackLocation": "eastus",
       "hlfResourceProviderLocation": "[if(contains(variables('hlfResourceProviderLocationMap'), parameters('location')), variables('hlfResourceProviderLocationMap')[parameters('location')], variables('hlfResourceProviderFallbackLocation'))]",
   
       "omsagentAksTrigger": {
@@ -667,7 +661,7 @@
         "apiVersion": "2020-10-01",
         "name": "publicIpDeployment",
         "dependsOn": [
-          "[resourceId('Microsoft.ContainerService/managedClusters/', parameters('clusterName'))]"
+          "[resourceId('Microsoft.CustomProviders/resourceProviders/', variables('hlfResourceProvider'))]"
         ],
         "type": "Microsoft.Resources/deployments",
         "resourceGroup": "[variables('aksManagedResourceGroup')]",
@@ -698,7 +692,7 @@
       },
       {
         "type": "Microsoft.DBforPostgreSQL/servers",
-        "apiVersion": "2017-12-01-preview",
+        "apiVersion": "2017-12-01",
         "name": "[variables('pg_fabric_ca_server_name')]",
         "location": "[parameters('location')]",
         "sku": {
@@ -723,7 +717,7 @@
           {
             "name": "[variables('pg_fabric_ca_database_name')]",
             "type": "databases",
-            "apiVersion": "2017-12-01-preview",
+            "apiVersion": "2017-12-01",
             "properties": {
               "charset": "utf8",
               "collation": "English_United States.1252"
@@ -734,7 +728,7 @@
           },
           {
             "type": "firewallRules",
-            "apiVersion": "2017-12-01-preview",
+            "apiVersion": "2017-12-01",
             "name": "[variables('pg_fabric_ca_firewall_rules_name')]",
             "properties": {
               "startIpAddress": "0.0.0.0",
@@ -799,7 +793,7 @@
               },
               {
                 "name": "AzureWebJobsStorage",
-				"value": "[concat('DefaultEndpointsProtocol=https;AccountName=',variables('storageName'),';AccountKey=',listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('storageName')), '2019-06-01').keys[0].value,';EndpointSuffix=','core.chinacloudapi.cn')]"
+                "value": "[concat('DefaultEndpointsProtocol=https;AccountName=',variables('storageName'),';AccountKey=',listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('storageName')), '2019-06-01').keys[0].value)]"
               },
               {
                 "name": "StorageBlobEndpoint",
@@ -811,7 +805,7 @@
               },
               {
                 "name": "WEBSITE_CONTENTAZUREFILECONNECTIONSTRING",
-				"value": "[concat('DefaultEndpointsProtocol=https;AccountName=',variables('storageName'),';AccountKey=',listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('storageName')), '2019-06-01').keys[0].value,';EndpointSuffix=','core.chinacloudapi.cn')]"
+                "value": "[concat('DefaultEndpointsProtocol=https;AccountName=',variables('storageName'),';AccountKey=',listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('storageName')), '2019-06-01').keys[0].value)]"
               },
               {
                 "name": "WEBSITE_CONTENTSHARE",
@@ -872,12 +866,50 @@
         "apiVersion": "2018-11-01",
         "location": "[parameters('location')]",
         "kind": "functionapp"
+      },
+      {
+        "apiVersion": "2018-09-01-preview",
+        "type": "Microsoft.CustomProviders/resourceProviders",
+        "name": "[variables('hlfResourceProvider')]",
+        "location": "[variables('hlfResourceProviderLocation')]",
+        "dependsOn": [
+          "[variables('concatSitesAndFunc')]",
+          "[resourceId('Microsoft.KeyVault/vaults/accessPolicies', variables('keyVaultName'), 'add')]"
+        ],
+        "properties": {
+          "resourceTypes": [
+            {
+              "name": "deploy",
+              "routingType": "Proxy",
+              "endpoint": "[concat('https://', reference(resourceId('Microsoft.Web/sites/', variables('funcName'))).hostNames[0], '/api/{requestPath}', '?code=', listSecrets(resourceId('Microsoft.Web/sites/functions',variables('funcName'),'HttpTrigger'), '2018-11-01').key)]"
+            }
+          ]
+        }
+      },
+      {
+        "apiVersion": "2018-09-01-preview",
+        "type": "Microsoft.CustomProviders/resourceProviders/deploy",
+        "name": "[concat(variables('hlfResourceProvider'), '/', variables('funcName'))]",
+        "location": "[variables('hlfResourceProviderLocation')]",
+        "properties": {
+          "hlfOrgName": "[parameters('hlfOrgName')]",
+          "hlfNodesNumber": "[variables('hlfNumberNodes')]",
+          "hlfMemberType": "[parameters('hlfMemberType')]",
+          "hlfBackendDbType": "[parameters('hlfBackendDbType')]",
+          "clusterName": "[parameters('clusterName')]",
+          "kubernetesVersion": "[parameters('kubernetesVersion')]",
+          "userName": "[parameters('hlfUserName')]",
+          "userPswd": "[parameters('hlfCaPswd')]",
+          "postgresConnectionString": "[format('host={0} port=5432 user={1} password={2} dbname={3} sslmode=verify-full', reference(resourceId('Microsoft.DBforPostgreSQL/servers', variables('pg_fabric_ca_server_name')), '2017-12-01').fullyQualifiedDomainName, concat(variables('pg_administratorLogin'),'@', variables('pg_fabric_ca_server_name')), variables('pg_administratorPassword'), variables('pg_fabric_ca_database_name'))]",
+          "publicIpAddress": "[reference('publicIpDeployment').outputs.publicIpAddress.value]",
+          "dnsZoneDomain": "[reference(resourceId('Microsoft.ContainerService/managedClusters/', parameters('clusterName')), '2020-09-01').addonProfiles.httpApplicationRouting.config.HTTPApplicationRoutingZoneName]"
+        }
       }
     ],
     "outputs": {
       "hlfDeploy": {
         "type": "string",
-        "value": "[concat('Deploy finished.\nUse next command for connect directly to the aks cluster \naz aks get-credentials –g ', variables('resourceGroup'), ' -n ', parameters('clusterName'), ' password= ', variables('pg_administratorPassword'))]"
+        "value": "[concat('Deploy finished.\nUse next command for connect directly to the aks cluster \naz aks get-credentials –g ', variables('resourceGroup'), ' -n ', parameters('clusterName'))]"
       }
     }
   }

@@ -67,10 +67,10 @@ isFile() {
 }
 
 checkNodeName() {
-    node=$(cat $2 | jq '.'$1's.'$3'' | sed 's/grpcs:\/\///g' | tr -d '"')
+    node=$(cat $2 | jq '.'$1's."'$3'.'$4'"' | sed 's/grpcs:\/\///g' | tr -d '"')
     if [ "$node" = null ]; then
         echo
-        echo "Invalid node name: \"$3\" OR invalid connection profile file for $1 organization"
+        echo "Invalid node name: \"$3\" OR invalid connection profile file for $1 organization: $4!"
         echo
 
         return 1
@@ -84,50 +84,33 @@ createOrgMSP() {
     adminProfilePath=$2
     connectionProfilePath=$3
     mspProfilePath=$4
+    nodeName=$5
 
-    rm -rf ./cryptoconfig/${nodeType}/${orgName}/*
-    mkdir -p ./cryptoconfig/${nodeType}/${orgName}/msp/{admincerts,cacerts,keystore,signcerts,tlscacerts}
-    mkdir -p ./cryptoconfig/${nodeType}/${orgName}/users/admin.${orgName}/msp/{admincerts,cacerts,keystore,signcerts,tlscacerts}
-    mkdir -p ./cryptoconfig/${nodeType}/${orgName}/tls
-    mkdir -p ./cryptoconfig/${nodeType}/${orgName}/ca/tlsca
+    rm -rf ./${nodeType}/${orgName}/*
+    mkdir -p ./${nodeType}/${orgName}/msp/{admincerts,cacerts,keystore,signcerts,tlscacerts}
+    mkdir -p ./${nodeType}/${orgName}/tls
+    
     #admincerts
-    cat ${adminProfilePath} | jq '.cert' | tr -d '"' | base64 -d > ./cryptoconfig/${nodeType}/${orgName}/msp/admincerts/cert.pem
-    cat ${adminProfilePath} | jq '.cert' | tr -d '"' | base64 -d > ./cryptoconfig/${nodeType}/${orgName}/users/admin.${orgName}/msp/admincerts/cert.pem
+    cat ${adminProfilePath} | jq '.cert' | tr -d '"' | base64 -d > ./${nodeType}/${orgName}/msp/admincerts/cert.pem
 
     #cacerts
-    cat ${mspProfilePath} | jq '.cacerts' | tr -d '"' | base64 -d > ./cryptoconfig/${nodeType}/${orgName}/msp/cacerts/rca.pem
-    cat ${mspProfilePath} | jq '.cacerts' | tr -d '"' | base64 -d > ./cryptoconfig/${nodeType}/${orgName}/users/admin.${orgName}/msp/cacerts/rca.pem
+    cat ${mspProfilePath} | jq '.cacerts' | tr -d '"' | base64 -d > ./${nodeType}/${orgName}/msp/cacerts/rca.pem
 
-
-    cat $connectionProfilePath | jq '.certificateAuthorities.'${orgName}'CA.tlsCACerts.pem' | tr -d '"' | sed 's/\\n/\n/g' > ./cryptoconfig/${nodeType}/${orgName}/ca/tlsca/cert.pem
-    cat $connectionProfilePath | jq '.certificateAuthorities.'${orgName}'CA.tlsCACerts.pem' | tr -d '"' | sed 's/\\n/\n/g' > ./cryptoconfig/${nodeType}/${orgName}/msp/tlscacerts/cert.pem
-
-   for row in  $(cat $connectionProfilePath | jq '.organizations.'${orgName}'.'$nodeType's[]'); do
-
-    folderName=$(sed -e 's/^"//' -e 's/"$//' <<<"$row")
-    checkNodeName ${nodeType} ${connectionProfilePath} ${row}
-     mkdir -p ./cryptoconfig/${nodeType}/${orgName}/${folderName}/msp/tlscacerts
     #tlscacerts
-    cat ${connectionProfilePath} | jq '.'$nodeType's.'$row'.tlsCACerts.pem' | tr -d '"' | sed 's/\\n/\n/g' > \
-    ./cryptoconfig/${nodeType}/${orgName}/$folderName/msp/tlscacerts/ca.crt
+    cat ${connectionProfilePath} | jq '.'$nodeType's."'$nodeName'.'${orgName}'".tlsCACerts.pem' | tr -d '"' | sed 's/\\n/\n/g' > \
+    ./${nodeType}/${orgName}/msp/tlscacerts/ca.crt
 
-   done
-   echo "path nodeType/orgName "${nodeType}"/"${orgName}
     #signcerts
-    cp ./cryptoconfig/${nodeType}/${orgName}/msp/admincerts/cert.pem ./cryptoconfig/${nodeType}/${orgName}/msp/signcerts/cert.pem
-    cp ./cryptoconfig/${nodeType}/${orgName}/msp/admincerts/cert.pem ./cryptoconfig/${nodeType}/${orgName}/users/admin.${orgName}/msp/signcerts/admin.${orgName}@${orgName}-cert.pem
-
+    cp ./${nodeType}/${orgName}/msp/admincerts/cert.pem ./${nodeType}/${orgName}/msp/signcerts/cert.pem
 
     #keystore
-    cat ${adminProfilePath} | jq '.private_key' | tr -d '"' | base64 -d > ./cryptoconfig/${nodeType}/${orgName}/msp/keystore/key.pem
-    cat ${adminProfilePath} | jq '.private_key' | tr -d '"' | base64 -d > ./cryptoconfig/${nodeType}/${orgName}/users/admin.${orgName}/msp/keystore/priv_sk
-
+    cat ${adminProfilePath} | jq '.private_key' | tr -d '"' | base64 -d > ./${nodeType}/${orgName}/msp/keystore/key.pem
 
     #admin-tls-cert
-    cat ${adminProfilePath} | jq '.tls_cert' | tr -d '"' | base64 -d > ./cryptoconfig/${nodeType}/${orgName}/tls/cert.pem
+    cat ${adminProfilePath} | jq '.tls_cert' | tr -d '"' | base64 -d > ./${nodeType}/${orgName}/tls/cert.pem
 
     #admin-tls-key
-    cat ${adminProfilePath} | jq '.tls_private_key' | tr -d '"' | base64 -d > ./cryptoconfig/${nodeType}/${orgName}/tls/key.pem
+    cat ${adminProfilePath} | jq '.tls_private_key' | tr -d '"' | base64 -d > ./${nodeType}/${orgName}/tls/key.pem
 }
 
 createOrdererTLSCA() {
@@ -162,8 +145,8 @@ setEnvVars() {
     fi 
 }
 
-peerArgsCount=4
-ordererArgsCount=4
+peerArgsCount=7
+ordererArgsCount=5
 
 nodeType=$1
 if [ "${nodeType}" = "peer" ]; then
@@ -180,16 +163,28 @@ if [ "${nodeType}" = "peer" ]; then
     peerAdminProfilePath=$2
     peerConnectionProfilePath=$3
     peerMSPProfilePath=$4
+    peerNodeName=$5
+    ordererConnectionProfilePath=$6
+    ordererNodeName=$7
 
     if ! isFile ${peerAdminProfilePath} || ! isFile ${peerConnectionProfilePath} \
-    || ! isFile ${peerMSPProfilePath}; then
+    || ! isFile ${peerMSPProfilePath} || ! isFile ${ordererConnectionProfilePath}; then
         printPeerCommandHelp
         return;
     fi
 
     peerOrgName=$(cat ${peerAdminProfilePath} | jq '.msp_id' | tr -d '"')
+    ordererOrgName=$(cat ${ordererConnectionProfilePath} | jq '.name' | tr -d '"')
 
-    createOrgMSP $peerOrgName $peerAdminProfilePath $peerConnectionProfilePath $peerMSPProfilePath 
+    if ! checkNodeName ${nodeType} ${peerConnectionProfilePath} ${peerNodeName} ${peerOrgName} \
+    || ! checkNodeName "orderer" ${ordererConnectionProfilePath} ${ordererNodeName} ${ordererOrgName}; then
+        printPeerCommandHelp
+        return;
+    fi
+
+    createOrgMSP $peerOrgName $peerAdminProfilePath $peerConnectionProfilePath $peerMSPProfilePath $peerNodeName
+    createOrdererTLSCA
+    setEnvVars $peerOrgName $peerConnectionProfilePath $peerNodeName $ordererConnectionProfilePath $ordererNodeName
 
     echo
     echo "======= Successfully configured environment for your ${nodeType} organization! ======="
@@ -200,7 +195,7 @@ elif [ "${nodeType}" = "orderer" ]; then
     echo
 
     if [ $# -ne $ordererArgsCount ]; then
-        echo "Invalid number of arguments while setting up Fabric CLI environment for ${nodeType} organization!"
+        cho "Invalid number of arguments while setting up Fabric CLI environment for ${nodeType} organization!"
         printOrdererCommandHelp
         return;
     fi
@@ -208,6 +203,7 @@ elif [ "${nodeType}" = "orderer" ]; then
     ordererAdminProfilePath=$2
     ordererConnectionProfilePath=$3
     ordererMSPProfilePath=$4
+    ordererNodeName=$5
 
     if ! isFile ${ordererAdminProfilePath} || ! isFile ${ordererConnectionProfilePath} \
     || ! isFile ${ordererMSPProfilePath}; then
@@ -217,8 +213,13 @@ elif [ "${nodeType}" = "orderer" ]; then
 
     ordererOrgName=$(cat ${ordererConnectionProfilePath} | jq '.name' | tr -d '"')
 
-    createOrgMSP $ordererOrgName $ordererAdminProfilePath $ordererConnectionProfilePath $ordererMSPProfilePath 
-    # setEnvVars $ordererOrgName $ordererConnectionProfilePath $ordererNodeName
+    if ! checkNodeName ${nodeType} ${ordererConnectionProfilePath} ${ordererNodeName} ${ordererOrgName}; then
+        printOrdererCommandHelp
+        return;
+    fi
+
+    createOrgMSP $ordererOrgName $ordererAdminProfilePath $ordererConnectionProfilePath $ordererMSPProfilePath $ordererNodeName
+    setEnvVars $ordererOrgName $ordererConnectionProfilePath $ordererNodeName
 
     echo
     echo "======= Successfully configured environment for your ${nodeType} organization! ======="
