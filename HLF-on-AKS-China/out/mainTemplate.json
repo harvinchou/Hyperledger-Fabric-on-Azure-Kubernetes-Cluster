@@ -888,8 +888,8 @@
         "value": "[parameters('hlfOrgName')]"
       },
       "hlfNodesNumber": {
-        "type": "string",
-        "value": "[variables('hlfNumberNodes')]"
+        "type": "int",
+        "value": "[int(variables('hlfNumberNodes'))]"
       },
       "hlfMemberType": {
         "type": "string",
